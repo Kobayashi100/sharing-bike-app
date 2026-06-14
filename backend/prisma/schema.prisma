@@ -1,0 +1,28 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum HistoryType {
+  RENT
+  RETURN
+  CHARGE_START
+  CHARGE_COMPLETE
+}
+
+model History {
+  id                      String      @id @default(cuid())
+  type                    HistoryType
+  user                    String
+  at                      DateTime    @default(now())
+
+  plannedReturnTime       String?
+  battery                 String?
+  plannedChargeCompleteAt DateTime?
+
+  createdAt               DateTime    @default(now())
+}

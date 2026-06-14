@@ -35,6 +35,7 @@
           {{ chargeButtonLabel }}
         </button>
       </div>
+      <button class="back" @click="router.push('/history')">利用履歴を見る</button>
 
       <!-- ログインに戻る -->
       <button class="back" @click="goLogin">ログイン画面に戻る</button>
@@ -128,18 +129,29 @@ const formatDateTime = (iso: string) => {
   return `${mm}/${dd}(${weekday}) ${hh}:${mi}`
 }
 
-const onRentSubmit = (plannedReturnTime: string | null) => {
-  app.rent(plannedReturnTime)
+const onRentSubmit = async (plannedReturnTime: string | null) => {
+  // モーダルは楽観的にすぐ閉じる
   showRentModal.value = false
+  try {
+    await app.rent(plannedReturnTime)
+  } catch (e) {
+    // エラー時は通知を表示するだけに留める
+    console.error('rent failed', e)
+  }
 }
 
 const closeRentModal = () => {
   showRentModal.value = false
 }
 
-const onReturnSubmit = (battery: string | null) => {
-  app.returnBike(battery)
+const onReturnSubmit = async (battery: string | null) => {
+  // モーダルは楽観的にすぐ閉じる
   showReturnModal.value = false
+  try {
+    await app.returnBike(battery)
+  } catch (e) {
+    console.error('return failed', e)
+  }
 }
 
 const closeReturnModal = () => {
@@ -161,17 +173,20 @@ const goLogin = () => router.push('/login')
 <style scoped>
 /* 画面全体 */
 .login-wrapper {
-  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: 100svh;
   display: flex;
   justify-content: center;
+  align-items: center;
   background: linear-gradient(#ffffff, #eeeeee);
+  padding: 16px;
 }
 
 /* 中央カード */
 .login-card {
   width: 100%;
   max-width: 420px;
-  padding: 48px 24px;
+  padding: 32px 20px;
   text-align: center;
 }
 
@@ -180,8 +195,11 @@ const goLogin = () => router.push('/login')
   font-weight: bold;
   color: #444;
 
-  margin-top: 45px;
-  margin-bottom: 32px;
+  margin-top: 16px;
+  margin-bottom: 22px;
+
+  font-size: 22px;
+  white-space: nowrap;
 }
 
 .welcome {
@@ -297,12 +315,41 @@ button.back {
   padding: 14px 0;
   border: none;
   border-radius: 10px;
-  background: #f2f2f2;
+  background: #f5f5f5;
   color: #555;
   font-size: 14px;
 }
 button.back:active {
-  background: #e7e7e7;
+  background: #332828;
   transform: translateY(1px);
+}
+</style>
+
+/* Mobile tweaks */
+<style scoped>
+@media (max-width: 420px) {
+  .login-wrapper {
+    padding: 12px;
+    align-items: center;
+    justify-content: center;
+    padding-top: env(safe-area-inset-top, 20px);
+    padding-bottom: env(safe-area-inset-bottom, 12px);
+    min-height: 100svh;
+  }
+
+  .login-card {
+    padding: 20px 16px;
+  }
+
+  .title {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    font-size: 20px;
+    white-space: normal;
+  }
+
+  .status-text {
+    font-size: 28px;
+  }
 }
 </style>

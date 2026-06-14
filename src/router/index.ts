@@ -1,16 +1,27 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '@/views/LoginView.vue'
-import TopPage from '@/views/TopPage.vue'
+import TopView from '@/views/TopPage.vue'
+import { setupGuards } from './middleware'
+import HistoryView from '@/views/HistoryView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
-    // 最初に開くURLを /login にしたいので、/ は /login にリダイレクト
     { path: '/', redirect: '/login' },
-
-    { path: '/login', name: 'login', component: LoginView },
-    { path: '/top', name: 'top', component: TopPage },
+    { path: '/login', component: LoginView },
+    {
+      path: '/top',
+      component: TopView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/history',
+      component: HistoryView,
+      meta: { requiresAuth: true },
+    },
   ],
 })
+
+setupGuards(router)
 
 export default router
