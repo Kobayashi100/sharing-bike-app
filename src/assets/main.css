@@ -33,3 +33,29 @@ a,
     padding: 0 2rem;
   }
 }
+
+/* Mobile / small devices: use full viewport and remove extra padding to avoid vertical overflow */
+@media (max-width: 420px) {
+  html,
+  body,
+  #app {
+    height: 100svh;
+    min-height: 100svh;
+  }
+
+  #app {
+    /* allow safe-area insets on iOS and keep content centered */
+    padding-top: env(safe-area-inset-top, 20px);
+    padding-bottom: env(safe-area-inset-bottom, 12px);
+    padding-left: env(safe-area-inset-left, 0);
+    padding-right: env(safe-area-inset-right, 0);
+    margin: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Reduce large section gaps on small screens */
+  :root {
+    --section-gap: 48px;
+  }
+}

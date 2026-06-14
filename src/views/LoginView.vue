@@ -32,17 +32,20 @@ const login = (user: 'ひなた' | 'まなみ') => {
 <style scoped>
 /* 画面全体 */
 .login-wrapper {
-  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: 100svh;
   display: flex;
   justify-content: center;
+  align-items: center;
   background: linear-gradient(#ffffff, #eeeeee);
+  padding: 16px;
 }
 
 /* 中央カード */
 .login-card {
   width: 100%;
   max-width: 420px;
-  padding: 48px 24px;
+  padding: 32px 20px;
   text-align: center;
 }
 
@@ -52,8 +55,8 @@ const login = (user: 'ひなた' | 'まなみ') => {
   font-weight: bold;
   color: #444;
 
-  margin-top: 45px;
-  margin-bottom: 32px;
+  margin-top: 16px;
+  margin-bottom: 22px;
 }
 
 /* 自転車アイコン */
@@ -92,5 +95,34 @@ button {
 
 button:hover {
   background: #ccc;
+}
+</style>
+
+/* Mobile tweaks */
+<style scoped>
+@media (max-width: 420px) {
+  .login-wrapper {
+    padding: 12px;
+    align-items: center;
+    justify-content: center;
+    padding-top: env(safe-area-inset-top, 20px);
+    padding-bottom: env(safe-area-inset-bottom, 12px);
+    min-height: 100svh;
+  }
+
+  .login-card {
+    padding: 20px 16px;
+    box-sizing: border-box;
+  }
+
+  .bike-icon {
+    width: 96px;
+    margin: 16px 0;
+  }
+
+  .button-group button {
+    width: 100px;
+    padding: 10px 0;
+  }
 }
 </style>
