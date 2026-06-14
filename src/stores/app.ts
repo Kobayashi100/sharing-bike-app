@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { postHistory } from '@/api/history'
+import { postHistory, fetchAppState, type AppState } from '@/api/history'
 
 export type BikeStatus = 'IDLE' | 'RENTING' | 'CHARGING'
 export type UserName = 'ひなた' | 'まなみ'
@@ -170,6 +170,60 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  const applyState = (appState: AppState) => {
+    status.value = appState.status
+    usingUserName.value = appState.usingUserName
+    chargingUserName.value = appState.chargingUserName
+    returnTime.value = appState.returnTime
+    plannedChargeCompleteAt.value = appState.plannedChargeCompleteAt
+    lastBatteryLevel.value = appState.lastBatteryLevel
+  }
+
+  const hydrate = async () => {
+    try {
+      const appState = await fetchAppState()
+      applyState(appState)
+    } catch (e) {
+      console.warn('failed to hydrate app state', e)
+    }
+  }
+
+  const connectWebSocket = () => {
+    if (typeof window === 'undefined') return
+    const url = 'ws://localhost:3000'
+
+    const create = () => {
+      try {
+        const ws = new WebSocket(url)
+
+        ws.addEventListener('message', (event) => {
+          try {
+            const data = JSON.parse(event.data)
+            if (data?.type === 'state' && data?.payload) {
+              applyState(data.payload as AppState)
+            }
+          } catch (error) {
+            console.warn('Invalid websocket message', error)
+          }
+        })
+
+        ws.addEventListener('close', () => {
+          console.warn('WebSocket closed, reconnecting...')
+          setTimeout(create, 2000)
+        })
+
+        ws.addEventListener('error', () => {
+          ws.close()
+        })
+      } catch (error) {
+        console.warn('WebSocket connection failed, retrying...', error)
+        setTimeout(create, 2000)
+      }
+    }
+
+    create()
+  }
+
   return {
     loginUserName,
     status,
@@ -193,5 +247,7 @@ export const useAppStore = defineStore('app', () => {
     returnBike,
     startCharging,
     completeCharging,
+    hydrate,
+    connectWebSocket,
   }
 })

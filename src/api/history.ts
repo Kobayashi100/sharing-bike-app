@@ -11,9 +11,11 @@ export type HistoryItem = {
   createdAt: string
 }
 
+export type UserName = 'ひなた' | 'まなみ'
+
 export type HistoryPayload = {
   type: HistoryType
-  user: 'ひなた' | 'まなみ'
+  user: UserName
   at?: string
   plannedReturnTime?: string | null
   battery?: string | null
@@ -38,6 +40,15 @@ export async function postHistory(payload: HistoryPayload) {
   return (await res.json()) as HistoryItem
 }
 
+export type AppState = {
+  status: 'IDLE' | 'RENTING' | 'CHARGING'
+  usingUserName: UserName | null
+  chargingUserName: UserName | null
+  returnTime: string | null
+  plannedChargeCompleteAt: string | null
+  lastBatteryLevel: string | null
+}
+
 export async function fetchHistory(limit = 50) {
   const res = await fetch(`${BASE}/api/history?limit=${limit}`)
 
@@ -47,4 +58,15 @@ export async function fetchHistory(limit = 50) {
   }
 
   return (await res.json()) as HistoryItem[]
+}
+
+export async function fetchAppState() {
+  const res = await fetch(`${BASE}/api/state`)
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '')
+    throw new Error(`Failed to fetch app state: ${res.status} ${text}`)
+  }
+
+  return (await res.json()) as AppState
 }
